@@ -1,0 +1,21 @@
+services:
+  db_resource:
+    container_name: "db_resource"
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+    ports:
+      - "13306:3306"
+    #volumes:
+    #  - "./scripts/mysql_prepare_root.sql:/docker-entrypoint-initdb.d/1.sql"
+
+  db_song:
+    container_name: "db_song"
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+    ports:
+      - "23306:3306"
+    #volumes:
+    #  - "./scripts/mysql_prepare_root.sql:/docker-entrypoint-initdb.d/1.sql"
+
