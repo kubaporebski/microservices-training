@@ -1,4 +1,4 @@
-package jporebski.microservices.resource_service;
+package jporebski.microservices.song_service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,42 +12,30 @@ import java.util.Set;
 @RequestMapping("/")
 public class MainService {
 
-    private final ResourceRepository repository;
-
-    private final Mpeg3Validator validator;
+    private final CreationRepository repository;
 
     @Autowired
-    public MainService(ResourceRepository repository, Mpeg3Validator validator)
-    {
+    public MainService(CreationRepository repository) {
         this.repository = repository;
-        this.validator = validator;
     }
 
-    @PostMapping("/resources")
-    public ResponseEntity<Resource> add(@RequestBody byte[] inputFileContents)
-    {
-        if (!validator.quickValidate(inputFileContents))
-            return ResponseEntity.badRequest().build();
-
-        var inputFile = new Resource(inputFileContents);
-        var saved = repository.save(inputFile);
-
-        return ResponseEntity.ok(new Resource(saved.getId()));
+    @PostMapping("/songs")
+    public ResponseEntity<AddResponse> add(@RequestBody Song song) {
+        var saved = repository.save(song);
+        return ResponseEntity.ok(new AddResponse(saved.getId()));
     }
 
-    @GetMapping("/resources/{id}")
-    public ResponseEntity<byte[]> get(@PathVariable("id") Integer id)
-    {
-        var data = repository.findById(id);
-        if (data.isEmpty())
+    @GetMapping("/songs/{id}")
+    public ResponseEntity<Song> get(@PathVariable("id") Integer id) {
+        var song = repository.findById(id);
+        if (song.isEmpty())
             return ResponseEntity.notFound().build();
 
-        return ResponseEntity.ok(data.get().getContents());
+        return ResponseEntity.ok(song.get());
     }
 
-    @DeleteMapping("/resources")
-    public ResponseEntity<DeleteResponse> delete(@RequestParam("id") String ids)
-    {
+    @DeleteMapping("/songs")
+    public ResponseEntity<DeleteResponse> delete(@RequestParam("ids") String ids) {
         if (ids == null || ids.isEmpty())
             return ResponseEntity.badRequest().build();
 
@@ -62,8 +50,8 @@ public class MainService {
         return ResponseEntity.ok(new DeleteResponse(deleted));
     }
 
-    public static class DeleteResponse
-    {
+    public static final class DeleteResponse {
+
         private final Set<Integer> ids;
 
         public DeleteResponse(Set<Integer> ids) {
@@ -74,5 +62,20 @@ public class MainService {
             return ids;
         }
     }
+
+
+    public static final class AddResponse {
+
+        private final int id;
+
+        public AddResponse(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
+    }
+
 
 }
