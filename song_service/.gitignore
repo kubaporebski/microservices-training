@@ -31,5 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Others
 /nohup.out
 /run.pid
+/output.log

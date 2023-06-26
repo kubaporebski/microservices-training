@@ -21,7 +21,7 @@ if [[ -f run.pid ]]; then
 fi
 
 mvn -Dmaven.test.skip=true clean package
-nohup java -jar target/song_service-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 & echo $! > run.pid
+nohup java -jar target/song_service-0.0.1-SNAPSHOT.jar > output.log 2>&1 & echo $! > run.pid
 echo Song service should be running at http://localhost:33312/
 
 cd $BASE_DIRECTORY
@@ -37,5 +37,5 @@ fi
 
 
 mvn -Dmaven.test.skip=true clean package
-nohup java -jar target/resource_service-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 & echo $! > run.pid
+nohup java -jar target/resource_service-0.0.1-SNAPSHOT.jar > output.log 2>&1 & echo $! > run.pid
 echo Resource service should be running at http://localhost:12333/
