@@ -1,7 +1,6 @@
 package jporebski.microservices.resource_service;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -87,7 +86,8 @@ public class MainService {
         return ResponseEntity.ok(new DeleteResponse(deleted));
     }
 
-    public record PostSongServiceRequest(String name, String artist, String album, Integer year, Integer length, Integer resourceId) {
+    public record PostSongServiceRequest(
+            String name, String artist, String album, Integer year, Integer length, Integer resourceId) {
 
         public static PostSongServiceRequest of(Mpeg3MetadataReader.Mpeg3Metadata metadata, Resource saved) {
             return new PostSongServiceRequest(
@@ -96,10 +96,8 @@ public class MainService {
         }
     }
 
-    public record DeleteResponse(Set<Integer> ids) {
-    }
+    public record DeleteResponse(Set<Integer> ids) { }
 
-    public record PostSongServiceResponse(Integer id) {
-    }
+    public record PostSongServiceResponse(Integer id) { }
 
 }

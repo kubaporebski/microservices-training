@@ -105,6 +105,15 @@ public class Song {
         this.resourceId = resourceId;
     }
 
+    /**
+     * Serialization and deserialization of the song duration.
+     * It is made for human-readable format of a song length.
+     * Example:
+     *  Song duration in seconds | String-formatted
+     *                        27 | 00:27
+     *                       121 | 02:01
+     *                      3601 | 01:00:01
+     */
     public final static class SongLengthJson {
 
         public static final class Deserializer extends JsonDeserializer<Integer> {
@@ -148,6 +157,10 @@ public class Song {
                     sb.append(pad0((value / 60) % 60)).append(":");
 
                 sb.append(pad0(value % 60));
+
+                // when a piece is less than minute long, let's return duration in the format: `00:ss`
+                if (value < 60)
+                    sb.insert(0, "00:");
 
                 jsonGenerator.writeString(sb.toString());
             }

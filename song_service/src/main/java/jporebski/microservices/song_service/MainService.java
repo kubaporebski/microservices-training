@@ -12,10 +12,10 @@ import java.util.Set;
 @RequestMapping("/")
 public class MainService {
 
-    private final CreationRepository repository;
+    private final SongRepository repository;
 
     @Autowired
-    public MainService(CreationRepository repository) {
+    public MainService(SongRepository repository) {
         this.repository = repository;
     }
 
@@ -36,7 +36,7 @@ public class MainService {
 
     @DeleteMapping("/songs")
     public ResponseEntity<DeleteResponse> delete(@RequestParam("ids") String ids) {
-        if (ids == null || ids.isEmpty())
+        if (ids == null || ids.isEmpty() || ids.length() >= 200)
             return ResponseEntity.badRequest().build();
 
         var deleted = new HashSet<Integer>();
@@ -50,32 +50,9 @@ public class MainService {
         return ResponseEntity.ok(new DeleteResponse(deleted));
     }
 
-    public static final class DeleteResponse {
+    public record DeleteResponse(Set<Integer> ids) { }
 
-        private final Set<Integer> ids;
-
-        public DeleteResponse(Set<Integer> ids) {
-            this.ids = ids;
-        }
-
-        public Set<Integer> getIds() {
-            return ids;
-        }
-    }
-
-
-    public static final class AddResponse {
-
-        private final int id;
-
-        public AddResponse(int id) {
-            this.id = id;
-        }
-
-        public int getId() {
-            return id;
-        }
-    }
+    public record AddResponse(int id) { }
 
 
 }
