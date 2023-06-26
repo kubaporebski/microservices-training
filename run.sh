@@ -1,11 +1,15 @@
 #!/bin/bash
 set -eu
 
-BASE_DIRECTORY=$(pwd)/..
+BASE_DIRECTORY=$(pwd)
 cd $BASE_DIRECTORY
 
 # start docker containers
 sudo docker-compose up -d
+
+# wait a few seconds
+echo Let\'s wait a few \(15\) seconds for docker containers to start...
+sleep 15
 
 # build and run song service
 cd song_service
@@ -13,9 +17,7 @@ cd song_service
 # kill the running instance of the Song Service
 if [[ -f run.pid ]]; then
   echo Detected running Song service, killing it...
-  SONG_PID=`cat run.pid`
-  kill $SONG_PID
-  rm run.pid
+  kill `cat run.pid` && rm run.pid
 fi
 
 mvn -Dmaven.test.skip=true clean package
@@ -30,9 +32,7 @@ cd resource_service
 # kill the running instance of the Resource Service
 if [[ -f run.pid ]]; then
   echo Detected running Resource service, killing it...
-  RSR_PID=`cat run.pid`
-  kill $RSR_PID
-  rm run.pid
+  kill `cat run.pid` && rm run.pid
 fi
 
 

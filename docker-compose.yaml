@@ -6,8 +6,8 @@ services:
       MYSQL_ROOT_PASSWORD: "root"
     ports:
       - "13306:3306"
-    #volumes:
-    #  - "./scripts/mysql_prepare_root.sql:/docker-entrypoint-initdb.d/1.sql"
+    volumes:
+      - "./scripts/mysql_prepare_resource.sql:/docker-entrypoint-initdb.d/1.sql"
 
   db_song:
     container_name: "db_song"
@@ -16,6 +16,6 @@ services:
       MYSQL_ROOT_PASSWORD: "root"
     ports:
       - "23306:3306"
-    #volumes:
-    #  - "./scripts/mysql_prepare_root.sql:/docker-entrypoint-initdb.d/1.sql"
+    volumes:
+      - "./scripts/mysql_prepare_song.sql:/docker-entrypoint-initdb.d/1.sql"
 
