@@ -42,18 +42,20 @@ public class MainService {
         var inputFile = new Resource(inputFileContents);
         var saved = repository.save(inputFile);
 
-        var metadata = metadataReader.read(inputFileContents);
-        var postRequest = PostSongServiceRequest.of(metadata, saved);
-        var postRequestJson = new Gson().toJson(postRequest);
+        if (songServiceUrl != null && !songServiceUrl.isEmpty()) {
 
-        var request = HttpRequest.newBuilder()
-                .uri(new URI(songServiceUrl))
-                .header("Content-type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(postRequestJson))
-                .build();
+            var metadata = metadataReader.read(inputFileContents);
+            var postRequestJson = new Gson().toJson(PostSongServiceRequest.of(metadata, saved));
 
-        var jsonResponse = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-        var response = new Gson().fromJson(jsonResponse.body(), PostSongServiceResponse.class);
+            var request = HttpRequest.newBuilder()
+                    .uri(new URI(songServiceUrl))
+                    .header("Content-type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(postRequestJson))
+                    .build();
+
+            HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            // var response = new Gson().fromJson(jsonResponse.body(), PostSongServiceResponse.class);
+        }
 
         return ResponseEntity.ok(new Resource(saved.getId()));
     }
