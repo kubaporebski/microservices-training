@@ -1,9 +1,16 @@
 package jporebski.microservices.resource_service;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,24 +20,40 @@ import java.util.Set;
 public class MainService {
 
     private final ResourceRepository repository;
-
     private final Mpeg3Validator validator;
+    private final Mpeg3MetadataReader metadataReader;
+
+    @Value("${songservice.url}")
+    private String songServiceUrl;
 
     @Autowired
-    public MainService(ResourceRepository repository, Mpeg3Validator validator)
+    public MainService(ResourceRepository repository, Mpeg3Validator validator, Mpeg3MetadataReader metadataReader)
     {
         this.repository = repository;
         this.validator = validator;
+        this.metadataReader = metadataReader;
     }
 
     @PostMapping("/resources")
-    public ResponseEntity<Resource> add(@RequestBody byte[] inputFileContents)
-    {
+    public ResponseEntity<Resource> add(@RequestBody byte[] inputFileContents) throws Exception {
         if (!validator.quickValidate(inputFileContents))
             return ResponseEntity.badRequest().build();
 
         var inputFile = new Resource(inputFileContents);
         var saved = repository.save(inputFile);
+
+        var metadata = metadataReader.read(inputFileContents);
+        var postRequest = PostSongServiceRequest.of(metadata, saved);
+        var postRequestJson = new Gson().toJson(postRequest);
+
+        var request = HttpRequest.newBuilder()
+                .uri(new URI(songServiceUrl))
+                .header("Content-type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(postRequestJson))
+                .build();
+
+        var jsonResponse = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        var response = new Gson().fromJson(jsonResponse.body(), PostSongServiceResponse.class);
 
         return ResponseEntity.ok(new Resource(saved.getId()));
     }
@@ -62,17 +85,19 @@ public class MainService {
         return ResponseEntity.ok(new DeleteResponse(deleted));
     }
 
-    public static class DeleteResponse
-    {
-        private final Set<Integer> ids;
+    public record PostSongServiceRequest(String name, String artist, String album, Integer year, Integer length, Integer resourceId) {
 
-        public DeleteResponse(Set<Integer> ids) {
-            this.ids = ids;
+        public static PostSongServiceRequest of(Mpeg3MetadataReader.Mpeg3Metadata metadata, Resource saved) {
+            return new PostSongServiceRequest(
+                    metadata.name(), metadata.album(), metadata.album(), metadata.year(), metadata.length(),
+                    saved.getId());
         }
+    }
 
-        public Set<Integer> getIds() {
-            return ids;
-        }
+    public record DeleteResponse(Set<Integer> ids) {
+    }
+
+    public record PostSongServiceResponse(Integer id) {
     }
 
 }
