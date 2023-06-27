@@ -10,10 +10,14 @@
         <module name="song_service" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="simplest" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="resource_service" options="-parameters" />
+      <module name="simplest" options="-parameters" />
       <module name="song_service" options="-parameters" />
     </option>
   </component>
