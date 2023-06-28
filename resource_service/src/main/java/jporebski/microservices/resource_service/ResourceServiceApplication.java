@@ -24,7 +24,7 @@ public class ResourceServiceApplication {
 	}
 
 	/**
-	 * Low-level (TCP socket) checking if connection to the database is possible.
+	 * Low-level (TCP socket) checking if a connection to the database is possible.
 	 *
 	 * @return true - the db is accepting connections / false - otherwise
 	 */
@@ -36,7 +36,7 @@ public class ResourceServiceApplication {
 		var maxTries = Integer.parseInt(Objects.toString(System.getenv("SC_DB_RETRY_COUNT"), "15"));
 		var lastException = (Exception)null;
 
-		logger.info("Trying to connect to database at {}:{}", databaseHost, databasePort);
+		logger.info("Trying to connect to the database at {}:{}", databaseHost, databasePort);
 
 		while (tries <= maxTries) {
 			logger.warn("Try #{} out of {}... ", tries, maxTries);

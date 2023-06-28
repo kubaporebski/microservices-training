@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eu
 
 echo Resource service...
 cd resource_service

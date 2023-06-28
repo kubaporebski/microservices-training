@@ -3,6 +3,7 @@ networks:
     driver: bridge
 
 services:
+  # Resource service
   sc_resource:
     container_name: sc_resource
     build: resource_service
@@ -15,8 +16,9 @@ services:
       SC_DB_RETRY_COUNT: 15
     links:
       - db_resource
-      - "sc_song:${SC_RESOURCE_SONG_HOSTNAME_ALIAS}" # why alias? I had an error when passing "sc_song" to the URI java constructor
-                                                     # so I removed underscore, and it works as expected (weird)
+      - "sc_song:${SC_RESOURCE_SONG_HOSTNAME_ALIAS}" # Why an alias? I had an error when passing "sc_song" to the URI java constructor (weird).
+                                                     # What's more interesting, the creation of the same URI object worked well in the `jshell`.
+                                                     # So I removed underscore here, and it works as expected.
     ports:
       - "${SC_RESOURCE_PORT}:${SC_RESOURCE_PORT}"
     networks:
@@ -25,6 +27,7 @@ services:
       db_resource:
         condition: service_started
 
+  # Database that contains resource data, used by the resource service
   db_resource:
     container_name: db_resource
     image: mysql
@@ -35,6 +38,7 @@ services:
     networks:
       - mikro
 
+  # Song service
   sc_song:
     container_name: sc_song
     build: song_service
@@ -54,6 +58,7 @@ services:
       db_song:
         condition: service_started
 
+  # Database that contains songs data, used by the song service
   db_song:
     container_name: db_song
     image: mysql
