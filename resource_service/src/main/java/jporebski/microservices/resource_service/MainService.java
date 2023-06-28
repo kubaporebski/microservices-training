@@ -1,6 +1,8 @@
 package jporebski.microservices.resource_service;
 
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,8 @@ import java.util.Set;
 @RestController
 @RequestMapping("/")
 public class MainService {
+
+    private static final Logger logger = LoggerFactory.getLogger(MainService.class);
 
     private final ResourceRepository repository;
     private final Mpeg3Validator validator;
@@ -42,6 +46,8 @@ public class MainService {
         var saved = repository.save(inputFile);
 
         if (songServiceUrl != null && !songServiceUrl.isEmpty()) {
+
+            logger.warn("Calling Song service at {}", songServiceUrl);
 
             var metadata = metadataReader.read(inputFileContents);
             var postRequestJson = new Gson().toJson(PostSongServiceRequest.of(metadata, saved));
