@@ -27,8 +27,8 @@ And the docker related files:
 To start (run everything) in the easiest way possible, just run `rebuild_and_run.sh`.
 
 # Service discovery
-Song service is be at http://localhost:33312.
-Resource service is be at http://localhost:12333.
+Song service is at http://localhost:33312.
+Resource service is at http://localhost:12333.
 
 
 # Links
