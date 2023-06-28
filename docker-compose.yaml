@@ -1,18 +1,21 @@
 networks:
   mikro:
-    driver: "bridge"
+    driver: bridge
 
 services:
   sc_resource:
-    container_name: "sc_resource"
-    build: "resource_service"
+    container_name: sc_resource
+    build: resource_service
     environment:
       SC_RESOURCE_PORT: "${SC_RESOURCE_PORT}"
-      SC_RESOURCE_DB_URL: "${SC_RESOURCE_DB_URL}"
-      SC_SONG_URL: "${SC_SONG_URL}"
+      SC_RESOURCE_DB_HOST: db_resource
+      SC_RESOURCE_DB_PORT: 3306 # default mysql port
+      SC_SONG_URL: "sc_song:${SC_SONG_PORT}"
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      SC_DB_RETRY_COUNT: 15
     links:
       - db_resource
+      # - sc_song TODO
     ports:
       - "${SC_RESOURCE_PORT}"
     networks:
@@ -22,24 +25,20 @@ services:
         condition: service_started
 
   db_resource:
-    container_name: "db_resource"
+    container_name: db_resource
     image: mysql
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-    ports:
-      - "${SC_RESOURCE_DB_PORT}:3306"
     volumes:
       - "./scripts/mysql_prepare_resource.sql:/docker-entrypoint-initdb.d/1.sql"
     networks:
       - mikro
 
   db_song:
-    container_name: "db_song"
+    container_name: db_song
     image: mysql
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-    ports:
-      - "${SC_SONG_DB_PORT}:3306"
     volumes:
       - "./scripts/mysql_prepare_song.sql:/docker-entrypoint-initdb.d/1.sql"
     networks:
