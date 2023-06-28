@@ -15,7 +15,8 @@ services:
       SC_DB_RETRY_COUNT: 15
     links:
       - db_resource
-      - "sc_song:${SC_RESOURCE_SONG_HOSTNAME_ALIAS}"
+      - "sc_song:${SC_RESOURCE_SONG_HOSTNAME_ALIAS}" # why alias? I had an error when passing "sc_song" to the URI java constructor
+                                                     # so I removed underscore, and it works as expected (weird)
     ports:
       - "${SC_RESOURCE_PORT}:${SC_RESOURCE_PORT}"
     networks:
