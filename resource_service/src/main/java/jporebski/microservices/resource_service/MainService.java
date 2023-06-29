@@ -97,7 +97,7 @@ public class MainService {
 
         public static PostSongServiceRequest of(Mpeg3MetadataReader.Mpeg3Metadata metadata, Resource saved) {
             return new PostSongServiceRequest(
-                    metadata.name(), metadata.album(), metadata.album(), metadata.year(), metadata.length(),
+                    metadata.name(), metadata.artist(), metadata.album(), metadata.year(), metadata.length(),
                     saved.getId());
         }
     }
