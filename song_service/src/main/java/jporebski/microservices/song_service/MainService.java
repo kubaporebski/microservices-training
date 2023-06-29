@@ -35,7 +35,7 @@ public class MainService {
     }
 
     @DeleteMapping("/songs")
-    public ResponseEntity<DeleteResponse> delete(@RequestParam("ids") String ids) {
+    public ResponseEntity<DeleteResponse> delete(@RequestParam("id") String ids) {
         if (ids == null || ids.isEmpty() || ids.length() >= 200)
             return ResponseEntity.badRequest().build();
 
