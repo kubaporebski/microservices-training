@@ -3,6 +3,17 @@ networks:
     driver: bridge
 
 services:
+  # Eureka Server
+  eureka_server:
+    container_name: eureka_server
+    build: eureka_service
+    environment:
+      EUREKA_PORT: "${EUREKA_PORT}"
+    ports:
+      - "${EUREKA_PORT}:${EUREKA_PORT}"
+    networks:
+      - mikro
+
   # Resource service
   sc_resource:
     container_name: sc_resource
@@ -14,17 +25,22 @@ services:
       SC_SONG_URL: "${SC_RESOURCE_SONG_HOSTNAME_ALIAS}:${SC_SONG_PORT}"
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
       SC_DB_RETRY_COUNT: 15
+      EUREKA_HOST: "${EUREKA_HOST}"
+      EUREKA_PORT: "${EUREKA_PORT}"
     links:
       - db_resource
       - "sc_song:${SC_RESOURCE_SONG_HOSTNAME_ALIAS}" # Why an alias? I had an error when passing "sc_song" to the URI java constructor (weird).
                                                      # What's more interesting, the creation of the same URI object worked well in the `jshell`.
                                                      # So I removed underscore here, and it works as expected.
+      - eureka_server
     ports:
       - "${SC_RESOURCE_PORT}:${SC_RESOURCE_PORT}"
     networks:
       - mikro
     depends_on:
       db_resource:
+        condition: service_started
+      eureka_server:
         condition: service_started
 
   # Database that contains resource data, used by the resource service
@@ -42,20 +58,27 @@ services:
   sc_song:
     container_name: sc_song
     build: song_service
+    stdin_open: true
+    tty: true
     environment:
       SC_SONG_PORT: "${SC_SONG_PORT}"
       SC_SONG_DB_HOST: db_song
       SC_SONG_DB_PORT: 3306 # default mysql port
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
       SC_DB_RETRY_COUNT: 15
+      EUREKA_HOST: "${EUREKA_HOST}"
+      EUREKA_PORT: "${EUREKA_PORT}"
     links:
       - db_song
+      - eureka_server
     ports:
       - "${SC_SONG_PORT}:${SC_SONG_PORT}"
     networks:
       - mikro
     depends_on:
       db_song:
+        condition: service_started
+      eureka_server:
         condition: service_started
 
   # Database that contains songs data, used by the song service
