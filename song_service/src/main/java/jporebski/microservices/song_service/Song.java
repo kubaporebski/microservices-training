@@ -121,11 +121,15 @@ public class Song {
             @Override
             public Integer deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
                 var length = jsonParser.getValueAsString();
+                return deserializeFromString(length);
+            }
+
+            public static Integer deserializeFromString(String length) {
                 if (length == null) {
                     return -1;
                 } else {
                     if (length.contains(":")) {
-                        var parts = Arrays.stream(length.split(":")).map(Integer::valueOf).collect(Collectors.toList());
+                        var parts = Arrays.stream(length.split(":")).map(Integer::valueOf).toList();
                         int hours = 0, minutes = 0, seconds = 0;
                         if (parts.size() == 2) {
                             minutes = parts.get(0);
@@ -148,6 +152,10 @@ public class Song {
 
             @Override
             public void serialize(Integer value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+                jsonGenerator.writeString(serializeToString(value));
+            }
+
+            public static String serializeToString(Integer value) {
                 var sb = new StringBuilder();
 
                 if (value >= 3600)
@@ -162,7 +170,7 @@ public class Song {
                 if (value < 60)
                     sb.insert(0, "00:");
 
-                jsonGenerator.writeString(sb.toString());
+                return sb.toString();
             }
 
             private static String pad0(Integer value) {
