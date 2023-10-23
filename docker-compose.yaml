@@ -4,8 +4,8 @@ networks:
 
 services:
   # Eureka Server
-  eureka_server:
-    container_name: eureka_server
+  eurekaserver:
+    container_name: eurekaserver
     build: eureka_service
     environment:
       EUREKA_PORT: "${EUREKA_PORT}"
@@ -29,10 +29,8 @@ services:
       EUREKA_PORT: "${EUREKA_PORT}"
     links:
       - db_resource
-      - "sc_song:${SC_RESOURCE_SONG_HOSTNAME_ALIAS}" # Why an alias? I had an error when passing "sc_song" to the URI java constructor (weird).
-                                                     # What's more interesting, the creation of the same URI object worked well in the `jshell`.
-                                                     # So I removed underscore here, and it works as expected.
-      - eureka_server
+      - "sc_song:${SC_RESOURCE_SONG_HOSTNAME_ALIAS}"
+      - eurekaserver
     ports:
       - "${SC_RESOURCE_PORT}:${SC_RESOURCE_PORT}"
     networks:
@@ -40,7 +38,7 @@ services:
     depends_on:
       db_resource:
         condition: service_started
-      eureka_server:
+      eurekaserver:
         condition: service_started
 
   # Database that contains resource data, used by the resource service
@@ -68,7 +66,7 @@ services:
       EUREKA_PORT: "${EUREKA_PORT}"
     links:
       - db_song
-      - eureka_server
+      - eurekaserver
     ports:
       - "${SC_SONG_PORT}:${SC_SONG_PORT}"
     networks:
@@ -76,7 +74,7 @@ services:
     depends_on:
       db_song:
         condition: service_started
-      eureka_server:
+      eurekaserver:
         condition: service_started
 
   # Database that contains songs data, used by the song service
@@ -90,21 +88,21 @@ services:
     networks:
       - mikro
 
-  cli:
-    container_name: cli
-    image: alpine
-    stdin_open: true
-    tty: true
-    links:
-      - eureka_server
-      - sc_resource
-      - sc_song
-      - db_resource
-      - db_song
-    networks:
-      - mikro
-    environment:
-      EUREKA_HOST: "${EUREKA_HOST}"
-      EUREKA_PORT: "${EUREKA_PORT}"
+#  cli:
+#    container_name: cli
+#    image: alpine
+#    stdin_open: true
+#    tty: true
+#    links:
+#      - eurekaserver
+#      - sc_resource
+#      - sc_song
+#      - db_resource
+#      - db_song
+#    networks:
+#      - mikro
+#    environment:
+#      EUREKA_HOST: "${EUREKA_HOST}"
+#      EUREKA_PORT: "${EUREKA_PORT}"
 
 
