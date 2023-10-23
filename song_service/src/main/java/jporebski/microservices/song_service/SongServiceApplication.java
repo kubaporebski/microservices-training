@@ -32,7 +32,7 @@ public class SongServiceApplication {
 		var databasePort = Integer.parseInt(System.getenv("SC_SONG_DB_PORT"));
 		var sa = new InetSocketAddress(databaseHost, databasePort);
 		var tries = 1;
-		var maxTries = Integer.parseInt(Objects.toString(System.getenv("SC_DB_RETRY_COUNT"), "15"));
+		var maxTries = Integer.parseInt(Objects.toString(System.getenv("SC_DB_RETRY_COUNT"), "3"));
 		var lastException = (Exception)null;
 
 		logger.info("Trying to connect to the database at {}:{}", databaseHost, databasePort);
@@ -41,7 +41,6 @@ public class SongServiceApplication {
 			logger.warn("Try #{} out of {}... ", tries, maxTries);
 			try {
 				try (var tcp = new Socket()) {
-
 					tcp.connect(sa);
 					if (tcp.isConnected()) {
 						logger.info("OK. Database connection possible.");
@@ -52,7 +51,7 @@ public class SongServiceApplication {
 					lastException = ioEx;
 					logger.warn("Database connection error occured: {}", ioEx.getMessage());
 					tries++;
-					Thread.sleep((long) (Math.random() * 1111 + 1111));
+					Thread.sleep(5_000); // 5 seconds
 				}
 			}
 			catch (Exception wtfEx) {

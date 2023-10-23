@@ -25,13 +25,14 @@ services:
       SC_RESOURCE_DB_HOST: db_resource
       SC_RESOURCE_DB_PORT: 3306 # default mysql port
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-      SC_DB_RETRY_COUNT: 15
+      SC_DB_RETRY_COUNT: 3
       EUREKA_HOST: "${EUREKA_HOST}"
       EUREKA_PORT: "${EUREKA_PORT}"
     ports:
       - "${SC_RESOURCE_PORT}:${SC_RESOURCE_PORT}"
     networks:
       - mikro
+    restart: on-failure
     depends_on:
       db_resource:
         condition: service_started
@@ -58,11 +59,12 @@ services:
       SC_SONG_DB_HOST: db_song
       SC_SONG_DB_PORT: 3306 # default mysql port
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-      SC_DB_RETRY_COUNT: 15
+      SC_DB_RETRY_COUNT: 3
       EUREKA_HOST: "${EUREKA_HOST}"
       EUREKA_PORT: "${EUREKA_PORT}"
     ports:
       - "${SC_SONG_PORT}:${SC_SONG_PORT}"
+    restart: on-failure
     networks:
       - mikro
     depends_on:

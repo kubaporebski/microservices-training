@@ -51,7 +51,8 @@ public class MainService {
     }
 
     @PostMapping("/resources")
-    public ResponseEntity<Resource> add(@RequestBody byte[] inputFileContents) throws Exception {
+    public ResponseEntity<Resource> add(@RequestBody byte[] inputFileContents) throws Exception
+    {
         if (!validator.quickValidate(inputFileContents))
             return ResponseEntity.badRequest().build();
 
