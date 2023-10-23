@@ -41,6 +41,12 @@ class ResourceServiceApplicationTests {
 		Assert.notNull(sample0mp3, "Sample file #0 should be there for testing");
 	}
 
+	// @BeforeAll
+	// recommended to run a temporary docker mysql container:
+	//   1. sudo docker run --rm -it -p 3306:3306 --name qmy1 -e MYSQL_ROOT_PASSWORD=root  mysql/mysql-server:8.0
+	//   2. execute scripts/mysql_prepare_root.sql
+	//   3. create database resources
+
 	@Test
 	public void upload_a_resource_happyPath() throws Exception {
 		// Arrange

@@ -13,6 +13,13 @@ import java.util.Objects;
 @Component
 public class Mpeg3MetadataReader {
 
+    /**
+     * Extract valuable information from a MP3 file.
+     * Information retrieved: title, artist(s), album, release date, and duration [seconds]
+     *
+     * @param data - mp3 file contents as a byte array
+     * @return object which contains interesting information about provided mp3 file
+     */
     public Mpeg3Metadata read(byte[] data) {
 
         try (InputStream bais = new ByteArrayInputStream(data)) {

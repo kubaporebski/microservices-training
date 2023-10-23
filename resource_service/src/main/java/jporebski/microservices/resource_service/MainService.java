@@ -1,23 +1,22 @@
 package jporebski.microservices.resource_service;
 
-import com.google.gson.Gson;
+import com.netflix.discovery.EurekaClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 @RestController
 @RequestMapping("/")
+@EnableFeignClients
 public class MainService {
 
     private static final Logger logger = LoggerFactory.getLogger(MainService.class);
@@ -26,8 +25,22 @@ public class MainService {
     private final Mpeg3Validator validator;
     private final Mpeg3MetadataReader metadataReader;
 
-    @Value("${songservice.url}")
-    private String songServiceUrl;
+    /**
+     * Eureka client for discovery of other clients.
+     */
+    @Autowired
+    @Lazy
+    private EurekaClient eurekaClient;
+
+    /**
+     * Interface pointing directly to Song Service.
+     * Contains method for adding a song.
+     *
+     * Interface will be created by Feign library.
+     */
+    @Autowired
+    @Lazy
+    private SongServiceAppInterface songServiceAppInterface;
 
     @Autowired
     public MainService(ResourceRepository repository, Mpeg3Validator validator, Mpeg3MetadataReader metadataReader)
@@ -45,21 +58,18 @@ public class MainService {
         var inputFile = new Resource(inputFileContents);
         var saved = repository.save(inputFile);
 
-        if (songServiceUrl != null && !songServiceUrl.isEmpty()) {
-
-            logger.warn("Calling Song service at {}", songServiceUrl);
+        logger.info("Has SongServiceInterface={}", songServiceAppInterface);
+        if (songServiceAppInterface != null) {
 
             var metadata = metadataReader.read(inputFileContents);
-            var postRequestJson = new Gson().toJson(PostSongServiceRequest.of(metadata, saved));
+            var request = SongServiceAppInterface.SongAddRequest.of(metadata, saved);
 
-            var request = HttpRequest.newBuilder()
-                    .uri(new URI(songServiceUrl))
-                    .header("Content-type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(postRequestJson))
-                    .build();
-
-            HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-            // var response = new Gson().fromJson(jsonResponse.body(), PostSongServiceResponse.class);
+            logger.info("Request={}", request);
+            // here is a real HTTP call to a remote song service, we don't just merely call some method in some interface
+            var response = songServiceAppInterface.add(request);
+            logger.info("Response={}", response);
+        } else {
+            logger.warn("SongServiceInterface couldn't be created for some reason");
         }
 
         return ResponseEntity.ok(new Resource(saved.getId()));
@@ -92,18 +102,31 @@ public class MainService {
         return ResponseEntity.ok(new DeleteResponse(deleted));
     }
 
-    public record PostSongServiceRequest(
-            String name, String artist, String album, Integer year, Integer length, Integer resourceId) {
-
-        public static PostSongServiceRequest of(Mpeg3MetadataReader.Mpeg3Metadata metadata, Resource saved) {
-            return new PostSongServiceRequest(
-                    metadata.name(), metadata.artist(), metadata.album(), metadata.year(), metadata.length(),
-                    saved.getId());
-        }
-    }
-
     public record DeleteResponse(Set<Integer> ids) { }
 
-    public record PostSongServiceResponse(Integer id) { }
+
+    /**
+     * We use Feign Client for calling another microservice.
+     * Methods must have same signature
+     */
+    @FeignClient("SongServiceApp")
+    public interface SongServiceAppInterface {
+
+        @PostMapping("/songs")
+        SongAddResponse add(@RequestBody SongAddRequest request);
+
+
+        record SongAddRequest(
+                String name, String artist, String album, Integer year, Integer length, Integer resourceId) {
+
+            static SongAddRequest of(Mpeg3MetadataReader.Mpeg3Metadata metadata, Resource saved) {
+                return new SongAddRequest(
+                        metadata.name(), metadata.artist(), metadata.album(), metadata.year(), metadata.length(),
+                        saved.getId());
+            }
+        }
+
+        record SongAddResponse(Integer id) { }
+    }
 
 }
