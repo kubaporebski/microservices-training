@@ -1,3 +1,5 @@
+version: "2"
+
 networks:
   mikro:
     driver: bridge
@@ -22,15 +24,10 @@ services:
       SC_RESOURCE_PORT: "${SC_RESOURCE_PORT}"
       SC_RESOURCE_DB_HOST: db_resource
       SC_RESOURCE_DB_PORT: 3306 # default mysql port
-      SC_SONG_URL: "${SC_RESOURCE_SONG_HOSTNAME_ALIAS}:${SC_SONG_PORT}"
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
       SC_DB_RETRY_COUNT: 15
       EUREKA_HOST: "${EUREKA_HOST}"
       EUREKA_PORT: "${EUREKA_PORT}"
-    links:
-      - db_resource
-      - "sc_song:${SC_RESOURCE_SONG_HOSTNAME_ALIAS}"
-      - eurekaserver
     ports:
       - "${SC_RESOURCE_PORT}:${SC_RESOURCE_PORT}"
     networks:
@@ -64,9 +61,6 @@ services:
       SC_DB_RETRY_COUNT: 15
       EUREKA_HOST: "${EUREKA_HOST}"
       EUREKA_PORT: "${EUREKA_PORT}"
-    links:
-      - db_song
-      - eurekaserver
     ports:
       - "${SC_SONG_PORT}:${SC_SONG_PORT}"
     networks:
@@ -87,22 +81,3 @@ services:
       - "./scripts/mysql_prepare_song.sql:/docker-entrypoint-initdb.d/1.sql"
     networks:
       - mikro
-
-#  cli:
-#    container_name: cli
-#    image: alpine
-#    stdin_open: true
-#    tty: true
-#    links:
-#      - eurekaserver
-#      - sc_resource
-#      - sc_song
-#      - db_resource
-#      - db_song
-#    networks:
-#      - mikro
-#    environment:
-#      EUREKA_HOST: "${EUREKA_HOST}"
-#      EUREKA_PORT: "${EUREKA_PORT}"
-
-
