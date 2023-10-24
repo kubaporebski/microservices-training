@@ -1,7 +1,7 @@
 # Microservices Training Course
 ## A bunch of information about this project
 
-This is a main folder that contains all the required resources that are prepared according to exercise requirements.
+This is main folder that contains all the required resources that are prepared according to exercise requirements.
 There could be some minor errors and differences to the exercises' requirements, but hey, I'm still learning ;-)
 And I try my best.
 
@@ -40,6 +40,17 @@ Resource service is at http://localhost:12333.
 
 ### Eureka server
 Eureka is exposed at http://localhost:8761/
+
+### OpenFeign
+I'm using OpenFeign library for a discovery of microservices. The particular usage is in Resource service, where there is a need to connect to Song service. 
+After adding binary data of a new MP3 file, Song service should be called to insert metadata of the newly added file. 
+So, in Resource service, there is simple interface annotated with `@FeignClient`, and there is also a field of that type interface, which is lazily autowired during construction of the service.
+
+I'm just calling a metod on that object, and, behind the scenes following is happening:
+1. First, Feign library is calling Eureka Server, for getting the URL of Song Service,
+2. And then, next call to SongService with POST data.
+
+See it for yourself in `resource_service/src/main/java/jporebski/microservices/MainService.java` file.
 
 # Links
 [Learn Digital Platform Course](https://learn.epam.com/study/path?rootId=515800)
