@@ -11,6 +11,7 @@ As services are written in Java 17, you need to set up properly your JAVA_HOME t
 # Structure
 This folder contains sub-folders:
 
+* **jpcommons**: Module containing commonly used java code (utility library).
 * **resource_service**: The service for handling binary data (mp3 files).
 * **song_service**: The service for handling mp3 files metadata (song title, artist, etc.).
 * **eureka_service**: The service acting as a "Service Registry".
@@ -26,8 +27,11 @@ And the docker related files:
 * .env
 
 # How to
-To start (run everything) in the easiest way possible, just run `rebuild_and_run.sh`. It will use maven to rebuild all projects,
-  and then, docker-compose to start up the environment.
+First run `mvn -f jpcommons/ clean install` to install `jpcommons` module, which is required by the song and resource service. 
+Then you can rebuild modules in any way you wish (mvn recommended).
+
+However, to start (run everything) in the easiest way possible, just run `rebuild_and_run.sh`. 
+This script is using maven to rebuild all projects, and then, docker-compose to build and start up the environment and all the services.
 
 # Services
 ### Base services
