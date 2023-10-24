@@ -50,7 +50,7 @@ I'm just calling a metod on that object, and, behind the scenes following is hap
 1. First, Feign library is calling Eureka Server, for getting the URL of Song Service,
 2. And then, next call to SongService with POST data.
 
-See it for yourself in [resource_service/MainService.java](resource_service/src/main/java/jporebski/microservices/MainService.java) file.
+See it for yourself in [resource_service/MainService.java](resource_service/src/main/java/jporebski/microservices/resource_service/MainService.java) file.
 
 # Links
 [Learn Digital Platform Course](https://learn.epam.com/study/path?rootId=515800)
