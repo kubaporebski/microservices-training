@@ -32,6 +32,7 @@ public class ResourceServiceApplication {
 	private static boolean tryConnectToDB() {
 		var databaseHost = System.getenv("SC_RESOURCE_DB_HOST");
 		var databasePort = Integer.parseInt(System.getenv("SC_RESOURCE_DB_PORT"));
-		return ConnectionUtils.tryConnect(databaseHost, databasePort);
+		var maxTries = Integer.parseInt(Objects.toString(System.getenv("SC_DB_RETRY_COUNT"), "3"));
+		return ConnectionUtils.tryConnect(databaseHost, databasePort, maxTries);
 	}
 }
