@@ -1,5 +1,6 @@
 package jporebski.microservices.resource_service;
 
+import jporebski.microservices.ConnectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -31,38 +32,6 @@ public class ResourceServiceApplication {
 	private static boolean tryConnectToDB() {
 		var databaseHost = System.getenv("SC_RESOURCE_DB_HOST");
 		var databasePort = Integer.parseInt(System.getenv("SC_RESOURCE_DB_PORT"));
-		var sa = new InetSocketAddress(databaseHost, databasePort);
-		var tries = 1;
-		var maxTries = Integer.parseInt(Objects.toString(System.getenv("SC_DB_RETRY_COUNT"), "3"));
-		var lastException = (Exception)null;
-
-		logger.info("Trying to connect to the database at {}:{}", databaseHost, databasePort);
-
-		while (tries <= maxTries) {
-			logger.warn("Try #{} out of {}... ", tries, maxTries);
-			try {
-				try (var tcp = new Socket()) {
-
-					tcp.connect(sa);
-					if (tcp.isConnected()) {
-						logger.info("OK. Database connection possible.");
-						return true;
-					}
-
-				} catch (IOException ioEx) {
-					lastException = ioEx;
-					logger.warn("Database connection error occured: {}", ioEx.getMessage());
-					tries++;
-					Thread.sleep(5_000); // 5 seconds
-				}
-			}
-			catch (Exception wtfEx) {
-				logger.error("Unexpected error", wtfEx);
-				return false;
-			}
-		}
-
-		logger.error("Could not obtain a connection to the database because the following error", lastException);
-		return false;
+		return ConnectionUtils.tryConnect(databaseHost, databasePort);
 	}
 }

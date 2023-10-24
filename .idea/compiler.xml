@@ -6,9 +6,10 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="resource_service" />
         <module name="song_service" />
         <module name="eureka_service" />
+        <module name="resource_service" />
+        <module name="jpcommons" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
