@@ -1,36 +1,36 @@
 package jporebski.microservices.resource_service;
 
-import feign.Client;
-import feign.Feign;
-import feign.Request;
-import feign.Response;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.cloud.openfeign.FeignClientsConfiguration;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(FeignClientsConfiguration.class)
+@Configuration
 class ResourceServiceApplicationTests {
 
 	private static final String URL_PATTERN = "http://localhost:%d/resources";
+
+	@Bean
+	public MainService.SongServiceAppInterface getSongServiceAppInterface() {
+		return new MainService.SongServiceAppInterface() {
+			@Override
+			public SongAddResponse add(SongAddRequest request) {
+				return new SongAddResponse(1);
+			}
+		};
+	}
 
 	@Autowired
 	private TestRestTemplate restTemplate;

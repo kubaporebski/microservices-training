@@ -108,7 +108,6 @@ public class MainService {
 
     /**
      * We use Feign Client for calling another microservice.
-     * Methods must have same signature
      */
     @FeignClient("SongServiceApp")
     public interface SongServiceAppInterface {
