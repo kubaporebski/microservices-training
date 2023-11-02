@@ -9,15 +9,10 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.deser.std.NumberDeserializers;
-import com.fasterxml.jackson.databind.deser.std.StringDeserializer;
-import com.fasterxml.jackson.databind.ser.std.NumberSerializers;
-import com.fasterxml.jackson.databind.ser.std.StringSerializer;
 import jakarta.persistence.*;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 @Entity
 @Table

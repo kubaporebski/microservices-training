@@ -3,7 +3,6 @@ package jporebski.microservices;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.Objects;
 import java.util.logging.Logger;
 
 public final class ConnectionUtils {

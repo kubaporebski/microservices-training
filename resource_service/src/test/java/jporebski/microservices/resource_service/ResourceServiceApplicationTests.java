@@ -1,36 +1,26 @@
 package jporebski.microservices.resource_service;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.Assert;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Configuration
 class ResourceServiceApplicationTests {
 
 	private static final String URL_PATTERN = "http://localhost:%d/resources";
 
-	@Bean
-	public MainService.SongServiceAppInterface getSongServiceAppInterface() {
-		return new MainService.SongServiceAppInterface() {
-			@Override
-			public SongAddResponse add(SongAddRequest request) {
-				return new SongAddResponse(1);
-			}
-		};
-	}
+	@MockBean
+	public MainService.SongServiceAppInterface songServiceAppInterface;
 
 	@Autowired
 	private TestRestTemplate restTemplate;
@@ -56,7 +46,6 @@ class ResourceServiceApplicationTests {
 		Assert.notNull(sample0mp3, "Sample file #0 should be there for testing");
 	}
 
-	// @BeforeAll
 	// recommended to run a temporary docker mysql container:
 	/*
 	sudo docker run --rm -it -p 3306:3306 --name qmy1 \
@@ -65,36 +54,14 @@ class ResourceServiceApplicationTests {
 		-e MYSQL_ROOT_PASSWORD=root \
 		mysql/mysql-server:8.0
 	*/
-/*
-	@RestController
-	@RequestMapping("/")
-	public static class MockSongService {
-
-		@PostMapping("/songs")
-		@ResponseBody
-		public String add(Object song) {
-			return "{'id':1}";
-		}
-
-	}
-*/
-
-	@BeforeAll
-	public static void beforeAll() {
-		/*
-		TODO
-		testFeignClient = Feign.builder().client(new Client() {
-			@Override
-			public Response execute(Request request, Request.Options options) throws IOException {
-				return Response.builder().body("{'id':1}", Charset.defaultCharset()).build();
-			}
-		}).build();
-		*/
-	}
 
 
 	@Test
 	public void upload_a_resource_happyPath() throws Exception {
+
+		// mock
+		BDDMockito.when(songServiceAppInterface.add(BDDMockito.any())).thenReturn(new MainService.SongServiceAppInterface.SongAddResponse(112233));
+
 
 		// Arrange
 		var request = prepareRequest(sample0mp3.getContentAsByteArray());
